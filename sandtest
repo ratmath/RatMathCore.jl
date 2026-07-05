@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p .julia_depot
+JULIA_DEPOT_PATH="$PWD/.julia_depot:" julia --project=. test/runtests.jl
