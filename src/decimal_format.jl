@@ -142,68 +142,64 @@ function period_modulo(x::Rational, system::BaseSystem; limit::Integer=1_000_000
     k
 end
 
-function _scientific_digits(r::Rational{BigInt}, precision::Integer)
-    n = abs(numerator(r))
-    d = denominator(r)
-    digits = Char[]
-    exponent = 0
-    remn = big(0)
-
-    if n >= d
-        whole = string(n ÷ d)
-        exponent = length(whole) - 1
-        for c in whole
-            push!(digits, c)
-        end
-        remn = n % d
-    else
-        remn = n
-        leading_zeros = 0
-        while remn * 10 < d
-            remn *= 10
-            leading_zeros += 1
-        end
-        exponent = -(leading_zeros + 1)
-    end
-
-    while length(digits) < precision && remn != 0
-        remn *= 10
-        push!(digits, Char(Int('0') + Int(remn ÷ d)))
-        remn %= d
-    end
-
-    (digits=digits, exponent=exponent, remainder=remn)
-end
-
-function _period_digits_for_scientific(r::Rational{BigInt}; compact::Bool=true)
-    rep = repeating_decimal(abs(r); compact=false)
-    hash_index = findfirst('#', rep)
-    isnothing(hash_index) && return ""
-    period = rep[nextind(rep, hash_index):end]
-    period == "0" ? "" : (compact ? _format_repeated_digits(period; threshold=7) : period)
-end
-
 function scientific_notation(x::Rational; compact::Bool=true, precision::Integer=11, show_period_info::Bool=false)::String
     r = rat(x)
     numerator(r) == 0 && return "0"
     negative = numerator(r) < 0
+    rep = repeating_decimal(abs(r); compact=false)
+    hash_index = findfirst('#', rep)
+    body = isnothing(hash_index) ? rep : rep[1:prevind(rep, hash_index)]
+    period = isnothing(hash_index) ? "" : rep[nextind(rep, hash_index):end]
+    is_repeating = !isempty(period) && period != "0"
 
-    sig = _scientific_digits(r, precision)
-    digits = sig.digits
-    rest = length(digits) > 1 ? String(digits[2:end]) : ""
-    period = _period_digits_for_scientific(r; compact=compact)
+    dot_index = findfirst('.', body)
+    whole = isnothing(dot_index) ? body : body[1:prevind(body, dot_index)]
+    initial = isnothing(dot_index) ? "" : body[nextind(body, dot_index):end]
 
-    if isempty(period)
-        rest = replace(rest, r"0+$" => "")
+    finite_digits = whole * initial
+    decimal_position = length(whole)
+    first_finite = findfirst(c -> c != '0', finite_digits)
+
+    mantissa = ""
+    exponent = 0
+
+    if !isnothing(first_finite)
+        exponent = decimal_position - first_finite
+        rest = finite_digits[nextind(finite_digits, first_finite):end]
+        if is_repeating
+            formatted_period = compact ? _format_repeated_digits(period; threshold=7) : period
+            mantissa = isempty(rest) ? string(finite_digits[first_finite]) * ".#" * formatted_period :
+                       string(finite_digits[first_finite]) * "." * rest * "#" * formatted_period
+        else
+            rest = replace(rest, r"0+$" => "")
+            mantissa = isempty(rest) ? string(finite_digits[first_finite]) : string(finite_digits[first_finite]) * "." * rest
+        end
+    else
+        is_repeating || return negative ? "-0" : "0"
+        first_period = findfirst(c -> c != '0', period)
+        isnothing(first_period) && return negative ? "-0" : "0"
+        exponent = -(length(initial) + first_period)
+        first_digit = period[first_period]
+        period_tail = period[nextind(period, first_period):end]
+        if isempty(period_tail)
+            period_tail = string(first_digit)
+        else
+            period_tail = period_tail[1:min(end, max(1, precision - 3))]
+        end
+        formatted_period = compact ? _format_repeated_digits(period_tail; threshold=7) : period_tail
+        mantissa = string(first_digit) * ".#" * formatted_period
     end
 
-    mantissa = isempty(rest) ? string(digits[1]) : string(digits[1]) * "." * rest
-    !isempty(period) && (mantissa *= "#" * period)
-
-    result = (negative ? "-" : "") * mantissa * "E" * string(sig.exponent)
-    if show_period_info
+    result = (negative ? "-" : "") * mantissa * "E" * string(exponent)
+    if show_period_info && is_repeating
+        info = String[]
+        initial_zeros = something(findfirst(c -> c != '0', initial), length(initial) + 1) - 1
+        period_zeros = something(findfirst(c -> c != '0', period), length(period) + 1) - 1
+        initial_zeros > 0 && push!(info, "initial: $initial_zeros zeros")
+        period_zeros > 0 && push!(info, "period starts: +$period_zeros zeros")
         p = repeating_decimal_with_period(r; compact=compact).period
-        p > 0 && (result *= " {period: $p}")
+        p > 0 && push!(info, "period: $p")
+        !isempty(info) && (result *= " {" * join(info, ", ") * "}")
     end
     result
 end

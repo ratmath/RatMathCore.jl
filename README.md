@@ -13,3 +13,8 @@ Start here:
 - `docs/` - compiled GitHub Pages-ready documentation after running `doc-setup/make.jl`.
 
 The intended implementation should use Julia's built-in `BigInt` and `Rational{BigInt}` as the mathematical foundation, then add RatMath-specific interval, unreduced fraction, base-system, and formatting behavior on top.
+
+
+The main reason for this port is to use this library in a Quarto book which uses js for interactive html version, but for pdf it only compiles julia or python. Went with Julia. 
+
+This repo was almost entirely coded up by the AI Codex 5.5 Medium. 

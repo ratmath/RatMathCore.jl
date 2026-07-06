@@ -32,6 +32,12 @@ If your Julia installation already has registry access configured, this may also
 julia --project=. -e 'using Pkg; Pkg.test()'
 ```
 
+Representative JavaScript RatMath parity samples can be checked with:
+
+```bash
+node test/js-parity-samples.mjs
+```
+
 ## Build the Documentation
 
 Documenter.jl is installed in the documentation setup environment:

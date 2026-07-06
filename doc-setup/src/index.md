@@ -13,8 +13,8 @@ The port intentionally uses Julia's native exact number types:
   - [`FractionInterval`](@ref)
   - [`BaseSystem`](@ref)
 
-The package is currently an implementation seed: it has a working core, representative tests, and
-documentation, but it is not yet a complete behavioral clone of the JavaScript package.
+The planned porting scope is implemented: the package has a working core, JavaScript RatMath parity
+samples for high-risk formatting behavior, expanded tests, and Documenter.jl documentation.
 
 ## Core Ideas
 
@@ -43,12 +43,13 @@ Implemented:
 - Exact interval arithmetic over rationals.
 - Unreduced fractions for mediants, Farey triples, and Stern-Brocot paths.
 - Custom base systems and repeating expansions.
+- Scientific notation matched against representative JavaScript RatMath outputs.
 - Continued fractions and convergents.
+- Compact and relative decimal interval notation.
+- Documenter.jl source under `doc-setup/` and GitHub Pages-ready HTML under `docs/`.
 
-Remaining work:
+Maintenance focus:
 
-- Expand test coverage to every target in `test-design.md`.
-- Tighten decimal and scientific notation parity with JavaScript edge cases.
-- Add compact and relative decimal interval notation.
-- Add more docstrings and doctests as behavior stabilizes.
+- Add more property tests for very large values as new edge cases are discovered.
+- Broaden `test/js-parity-samples.mjs` when RatMath JS formatting behavior changes.
 

@@ -37,13 +37,48 @@ using RatMathCore
     @test scientific_notation(0//1) == "0"
     @test scientific_notation(123//1) == "1.23E2"
     @test scientific_notation(1000//1) == "1E3"
+    @test scientific_notation(1200//1) == "1.2E3"
     @test scientific_notation(1//1000) == "1E-3"
-    @test occursin("#3", scientific_notation(1//3))
+    @test scientific_notation(1//3; show_period_info=true) == "3.#3E-1 {period: 1}"
     @test scientific_notation(-1//8) == "-1.25E-1"
-    @test occursin("period: 6", scientific_notation(1//7; show_period_info=true))
+    @test scientific_notation(1//7; show_period_info=true) == "1.#42857E-1 {period: 6}"
+    @test scientific_notation(1//6; show_period_info=true) == "1.#6E-1 {period: 1}"
+    @test scientific_notation(22//7; show_period_info=true) == "3.#142857E0 {period: 6}"
+    @test scientific_notation(1//28; show_period_info=true) == "3.#571428E-2 {initial: 1 zeros, period: 6}"
+    @test scientific_notation(1//12; show_period_info=true) == "8.#3E-2 {initial: 1 zeros, period: 1}"
+    @test scientific_notation(1//90; show_period_info=true) == "1.#1E-2 {initial: 1 zeros, period: 1}"
+    @test scientific_notation(100//33; show_period_info=true) == "3.#03E0 {period starts: +1 zeros, period: 2}"
+    @test scientific_notation(12345//28; show_period_info=true) == "4.4089#285714E2 {period: 6}"
+    @test scientific_notation(1//100000000) == "1E-8"
+    js_scientific_samples = Dict(
+        0//1 => "0",
+        123//1 => "1.23E2",
+        1000//1 => "1E3",
+        1200//1 => "1.2E3",
+        1//1000 => "1E-3",
+        1//3 => "3.#3E-1 {period: 1}",
+        -1//8 => "-1.25E-1",
+        1//7 => "1.#42857E-1 {period: 6}",
+        1//6 => "1.#6E-1 {period: 1}",
+        22//7 => "3.#142857E0 {period: 6}",
+        1//28 => "3.#571428E-2 {initial: 1 zeros, period: 6}",
+        1//12 => "8.#3E-2 {initial: 1 zeros, period: 1}",
+        1//90 => "1.#1E-2 {initial: 1 zeros, period: 1}",
+        100//33 => "3.#03E0 {period starts: +1 zeros, period: 2}",
+        12345//28 => "4.4089#285714E2 {period: 6}",
+        1//100000000 => "1E-8",
+    )
+    for (value, expected) in js_scientific_samples
+        @test scientific_notation(value; show_period_info=true) == expected
+    end
 
     i = RationalInterval(1, 2)
     j = RationalInterval(3, 4)
+    @test point_interval(3//4) == RationalInterval(3//4, 3//4)
+    @test parse_interval("1/3:2/3") == RationalInterval(1//3, 2//3)
+    @test 3//1 in RationalInterval(1, 4)
+    @test contains(RationalInterval(1, 4), RationalInterval(2, 3))
+    @test !contains(RationalInterval(1, 4), 5)
     @test i + j == RationalInterval(4, 6)
     @test i - j == RationalInterval(-3, -1)
     @test i * j == RationalInterval(3, 8)
@@ -64,9 +99,18 @@ using RatMathCore
     @test union(RationalInterval(1, 2), RationalInterval(3, 4)) === nothing
     @test midpoint(RationalInterval(1//3, 2//3)) == 1//2
     @test mediant(RationalInterval(1//3, 1//2)) == 2//5
+    @test shortest_decimal(RationalInterval(1224//1000, 1235//1000)) == 123//100
+    for _ in 1:5
+        sample = random_rational(RationalInterval(0, 1); max_denominator=10)
+        @test sample in RationalInterval(0, 1)
+        @test denominator(sample) <= 10
+    end
+    @test repeating_decimal(RationalInterval(1//3, 1//2)) == "0.#3:0.5#0"
     @test compacted_decimal_interval(RationalInterval(12356//10000, 12367//10000)) == "1.23[56,67]"
+    @test compacted_decimal_interval(RationalInterval(1224//1000, 1235//1000)) == "1.2[24,35]"
     @test relative_mid_decimal_interval(RationalInterval(1224//1000, 1235//1000)) == "1.2295[+-0.0055]"
-    @test occursin(r"^1\.23\[", relative_decimal_interval(RationalInterval(1224//1000, 1235//1000)))
+    @test relative_decimal_interval(RationalInterval(1224//1000, 1235//1000)) == "1.23[+5,-6]"
+    @test relative_decimal_interval(RationalInterval(12356//10000, 12367//10000)) == "1.236[+7,-4]"
 
     f = Fraction(2, 4)
     @test f != Fraction(1, 2)

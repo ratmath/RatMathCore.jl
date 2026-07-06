@@ -1,5 +1,18 @@
 # RatMath Core Julia Port Design
 
+## Implementation Status
+
+As of July 6, 2026, the planned implementation phases in this design are complete for the
+`RatMathCore.jl` package in this repository. The package includes the exact-rational helpers,
+`RationalInterval`, unreduced `Fraction` and `FractionInterval`, `BaseSystem`, repeating decimal
+and arbitrary-base expansion, scientific notation with representative JavaScript RatMath parity,
+continued fractions, Documenter.jl source under `doc-setup/`, and built GitHub Pages documentation
+under `docs/`.
+
+The active remaining work is maintenance hardening: broadening parity samples when JavaScript
+`packages/core` behavior changes, adding more property tests for very large values, and deciding
+whether future CI should rebuild `docs/` or treat it as a committed artifact.
+
 ## Purpose
 
 Create a Julia package that ports the useful behavior of RatMath `packages/core` while using Julia's native exact-number strengths. The port should not be a line-by-line translation. It should preserve RatMath's mathematical behavior, notation, and user-facing examples where they are valuable, while using Julia dispatch, operators, parametric types, and package conventions.

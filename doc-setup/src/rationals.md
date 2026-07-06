@@ -67,3 +67,6 @@ Scientific notation remains exact in the sense that it is derived from exact rat
 scientific_notation(1//7; show_period_info=true)
 ```
 
+```@example rationals
+scientific_notation(1//28; show_period_info=true)
+```
