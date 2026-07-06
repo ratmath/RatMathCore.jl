@@ -383,6 +383,22 @@ Return the path from the root `0/1` to a finite fraction in the RatMath Stern-Br
 """ stern_brocot_path
 
 @doc raw"""
+    stern_brocot_string(f)
+
+Return the Stern-Brocot path as a compact string such as `"RLRL"`.
+
+`stern_brocot_path` returns character steps for programmatic use; this helper is intended for
+compact display and documentation.
+
+# Examples
+
+```julia
+julia> stern_brocot_string(Fraction(3, 5))
+"RLRL"
+```
+""" stern_brocot_string
+
+@doc raw"""
     from_stern_brocot_path(path)
 
 Construct a `Fraction` from a Stern-Brocot path containing `L` and `R` steps.

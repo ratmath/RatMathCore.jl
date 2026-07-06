@@ -162,6 +162,8 @@ function stern_brocot_path(f::Fraction)
     path
 end
 
+stern_brocot_string(f::Fraction) = join(stern_brocot_path(f))
+
 function from_stern_brocot_path(path)::Fraction
     left = Fraction(-1, 0; allow_infinite=true)
     right = Fraction(1, 0; allow_infinite=true)

@@ -46,7 +46,7 @@ mediant(Fraction(1, 3), Fraction(1, 2))
 ## Stern-Brocot Paths
 
 ```@example fractions
-path = stern_brocot_path(Fraction(3, 5))
+path = stern_brocot_string(Fraction(3, 5))
 ```
 
 ```@example fractions
@@ -65,4 +65,3 @@ mediant_split(fi)
 ```@example fractions
 partition_with_mediants(fi, 2)
 ```
-

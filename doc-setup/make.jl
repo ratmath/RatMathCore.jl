@@ -6,6 +6,7 @@ using RatMathCore
 makedocs(
     sitename = "RatMathCore.jl",
     modules = [RatMathCore],
+    build = joinpath(@__DIR__, "..", "docs"),
     format = Documenter.HTML(
         prettyurls = false,
         canonical = nothing,

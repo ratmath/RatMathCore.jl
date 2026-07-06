@@ -78,7 +78,9 @@ using RatMathCore
     @test farey_parents(Fraction(0, 1)).left == Fraction(-1, 0; allow_infinite=true)
     @test_throws ArgumentError farey_parents(Fraction(1, 0; allow_infinite=true))
     @test stern_brocot_path(Fraction(0, 1)) == Char[]
+    @test stern_brocot_string(Fraction(3, 5)) == "RLRL"
     @test from_stern_brocot_path(stern_brocot_path(Fraction(3, 5))) == Fraction(3, 5)
+    @test from_stern_brocot_path(stern_brocot_string(Fraction(3, 5))) == Fraction(3, 5)
     @test stern_brocot_depth(Fraction(0, 1)) == 0
 
     fi = FractionInterval(Fraction(1, 3), Fraction(1, 2))

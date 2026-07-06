@@ -34,17 +34,17 @@ julia --project=. -e 'using Pkg; Pkg.test()'
 
 ## Build the Documentation
 
-Documenter.jl is installed in the docs environment:
+Documenter.jl is installed in the documentation setup environment:
 
 ```bash
 cd /Users/jostylr/ai-repos/ratmath/julia-port
-julia --project=docs docs/make.jl
+julia --project=doc-setup doc-setup/make.jl
 ```
 
-The generated site is written to:
+The generated GitHub Pages-ready site is written to:
 
 ```text
-docs/build/
+docs/
 ```
 
 ## First Examples
@@ -60,4 +60,3 @@ to_mixed_string(-7//3)
 ```@example getting-started
 repeating_decimal(1//6)
 ```
-

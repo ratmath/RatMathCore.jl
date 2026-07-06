@@ -50,6 +50,10 @@ RatMathCore.jl/
 │   ├── fraction_tests.jl
 │   ├── base_tests.jl
 │   └── formatting_tests.jl
+├── doc-setup/
+│   ├── Project.toml
+│   ├── make.jl
+│   └── src/
 └── docs/
 ```
 
