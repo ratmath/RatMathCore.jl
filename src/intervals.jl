@@ -144,6 +144,62 @@ function repeating_decimal(i::RationalInterval; compact::Bool=true)
     "$(repeating_decimal(i.start; compact=compact)):$(repeating_decimal(i.stop; compact=compact))"
 end
 
+function compacted_decimal_interval(i::RationalInterval)::String
+    start_str = to_decimal(i.start)
+    stop_str = to_decimal(i.stop)
+    common = IOBuffer()
+    limit = min(length(start_str), length(stop_str))
+    for idx in 1:limit
+        start_str[idx] == stop_str[idx] || break
+        print(common, start_str[idx])
+    end
+    prefix = String(take!(common))
+    if length(prefix) <= 1 || (startswith(prefix, "-") && length(prefix) <= 2)
+        return "$start_str:$stop_str"
+    end
+    suffix_start = length(prefix) + 1
+    start_suffix = suffix_start <= length(start_str) ? start_str[suffix_start:end] : ""
+    stop_suffix = suffix_start <= length(stop_str) ? stop_str[suffix_start:end] : ""
+    if isempty(start_suffix) || isempty(stop_suffix) || length(start_suffix) != length(stop_suffix)
+        return "$start_str:$stop_str"
+    end
+    occursin(r"^\d+$", start_suffix) && occursin(r"^\d+$", stop_suffix) || return "$start_str:$stop_str"
+    "$prefix[$start_suffix,$stop_suffix]"
+end
+
+function relative_mid_decimal_interval(i::RationalInterval)::String
+    mid = midpoint(i)
+    offset_start = i.start - mid
+    offset_stop = i.stop - mid
+    mid_str = to_decimal(mid)
+    if offset_start == -offset_stop
+        return "$mid_str[+-$(to_decimal(abs(offset_stop)))]"
+    end
+    start_str = to_decimal(offset_start)
+    stop_str = to_decimal(offset_stop)
+    start_prefix = offset_start > 0 ? "+" : ""
+    stop_prefix = offset_stop > 0 ? "+" : ""
+    "$mid_str[$start_prefix$start_str,$stop_prefix$stop_str]"
+end
+
+function relative_decimal_interval(i::RationalInterval)::String
+    base_value = shortest_decimal(i)
+    isnothing(base_value) && return relative_mid_decimal_interval(i)
+    offset_start = i.start - base_value
+    offset_stop = i.stop - base_value
+    base_str = to_decimal(base_value)
+    decimal_places = occursin(".", base_str) ? length(split(base_str, ".")[2]) : 0
+    scale_factor = decimal_places == 0 ? big(1)//big(1) : big(10)^(decimal_places + 1)//big(1)
+    scaled_start = offset_start * scale_factor
+    scaled_stop = offset_stop * scale_factor
+    if abs(offset_start + offset_stop) < 1//1_000_000
+        avg = (abs(scaled_start) + abs(scaled_stop)) / 2
+        return "$base_str[+-$(to_decimal(avg))]"
+    end
+    first_offset, second_offset = scaled_start >= scaled_stop ? (scaled_start, scaled_stop) : (scaled_stop, scaled_start)
+    "$base_str[+$(to_decimal(abs(first_offset))),-$(to_decimal(abs(second_offset)))]"
+end
+
 function e_notation(i::RationalInterval, exponent::Integer)
     factor = e_notation(1, exponent)
     RationalInterval(i.low * factor, i.high * factor)

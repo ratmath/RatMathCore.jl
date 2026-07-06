@@ -39,8 +39,5 @@ temp/
 build/
 dist/
 
-# Generated documentation
-docs/build/
-
 # Ignore anything you intentionally use for scratch work
 ignore/

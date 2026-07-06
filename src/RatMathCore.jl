@@ -7,6 +7,7 @@ export to_mixed_string, to_decimal
 export RationalInterval, point_interval, parse_interval, contains_zero, overlaps
 export intersection, union, midpoint, mediant, pow_interval, mpow_interval
 export shortest_decimal, random_rational
+export compacted_decimal_interval, relative_mid_decimal_interval, relative_decimal_interval
 export Fraction, FractionInterval, reduce_fraction, rational, scale
 export farey_parents, mediant_partner, is_mediant_triple, is_farey_triple
 export stern_brocot_path, from_stern_brocot_path, stern_brocot_parent
@@ -27,5 +28,6 @@ include("decimal_format.jl")
 include("continued_fractions.jl")
 include("fractions.jl")
 include("intervals.jl")
+include("docstrings.jl")
 
 end
