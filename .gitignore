@@ -5,6 +5,7 @@ logs/
 
 # Package manager
 Manifest.toml
+!doc-setup/Manifest.toml
 
 # Julia VS Code
 .vscode/

@@ -1,3 +1,10 @@
+function _expand_repeat_notation(s::AbstractString)::String
+    replace(s, r"\{(\d+)~(\d+)\}" => m -> begin
+        parsed = match(r"^\{(\d+)~(\d+)\}$", String(m))
+        repeat(parsed.captures[1], parse(Int, parsed.captures[2]))
+    end)
+end
+
 function rat(value::Rational)
     BigInt(numerator(value)) // BigInt(denominator(value))
 end
@@ -12,6 +19,7 @@ end
 function rat(value::AbstractString)
     s = strip(value)
     isempty(s) && throw(ArgumentError("invalid rational format"))
+    s = _expand_repeat_notation(s)
 
     if occursin("..", s)
         parts = split(s, "..")

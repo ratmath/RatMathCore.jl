@@ -117,7 +117,7 @@ function farey_parents(f::Fraction)
 end
 
 function mediant_partner(endpoint::Fraction, med::Fraction)
-    endpoint.infinite || med.infinite && throw(ArgumentError("cannot compute mediant partner with infinite fractions"))
+    (endpoint.infinite || med.infinite) && throw(ArgumentError("cannot compute mediant partner with infinite fractions"))
     r = med.num * 2 - endpoint.num
     s = med.den * 2 - endpoint.den
     Fraction(r, s)

@@ -482,6 +482,25 @@ Render an integer in a `BaseSystem`.
 """ from_decimal
 
 @doc raw"""
+    to_base(value, system; repeating=false)
+    to_base(value, base; repeating=false)
+
+Render an integer or rational using a base system. Rationals render as numerator/denominator in
+the requested base unless `repeating=true`, in which case RatMath repeating expansion notation is
+used.
+
+# Examples
+
+```julia
+julia> to_base(10, BaseSystem("01", "Binary"))
+"1010"
+
+julia> to_base(10//3, BaseSystem("01", "Binary"))
+"1010/11"
+```
+""" to_base
+
+@doc raw"""
     valid_digit_string(system, s)
 
 Return `true` when `s` contains only digits from `system`.

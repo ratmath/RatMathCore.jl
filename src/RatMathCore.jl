@@ -15,7 +15,7 @@ export stern_brocot_children, stern_brocot_depth, stern_brocot_ancestors
 export stern_brocot_string
 export mediant_split, partition_with_mediants, partition_with, rational_interval, fraction_interval
 export BaseSystem, base_system, create_base_pattern, to_decimal, from_decimal
-export valid_digit_string, with_case_sensitivity, register_prefix!, unregister_prefix!
+export to_base, valid_digit_string, with_case_sensitivity, register_prefix!, unregister_prefix!
 export system_for_prefix, prefix_for_system, get_char
 export repeating_decimal, repeating_decimal_with_period, repeating_base, repeating_base_with_period
 export period_modulo, scientific_notation

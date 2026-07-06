@@ -6,6 +6,7 @@ using RatMathCore
     @test rat("-2..1/4") == -9//4
     @test rat("1.25") == 5//4
     @test rat("-0.125") == -1//8
+    @test rat("0.{0~7}1") == 1//100000000
     @test_throws ArgumentError rat("3//4")
     @test_throws ArgumentError rat("1.2.3")
     @test exact_div(5, 2) == 5//2
@@ -27,10 +28,19 @@ using RatMathCore
     @test repeating_decimal(1//3) == "0.#3"
     @test repeating_decimal(1//7) == "0.#142857"
     @test repeating_decimal(-1//6) == "-0.1#6"
+    @test repeating_decimal(1//10^7) == "0.0000001#0"
+    @test repeating_decimal(1//10^8) == "0.{0~7}1#0"
     @test repeating_decimal_with_period(1//7).period == 6
     @test repeating_decimal_with_period(1//4).period == 0
     @test repeating_base(1//3, RatMathCore.BINARY) == "0.#01"
     @test period_modulo(1//7, RatMathCore.DECIMAL) == 6
+    @test scientific_notation(0//1) == "0"
+    @test scientific_notation(123//1) == "1.23E2"
+    @test scientific_notation(1000//1) == "1E3"
+    @test scientific_notation(1//1000) == "1E-3"
+    @test occursin("#3", scientific_notation(1//3))
+    @test scientific_notation(-1//8) == "-1.25E-1"
+    @test occursin("period: 6", scientific_notation(1//7; show_period_info=true))
 
     i = RationalInterval(1, 2)
     j = RationalInterval(3, 4)
@@ -73,6 +83,8 @@ using RatMathCore
     @test scale(Fraction(1, 2), 3) == Fraction(3, 6)
     @test e_notation(Fraction(3, 8), -1) == Fraction(3, 80)
     @test mediant(Fraction(1, 3), Fraction(1, 2)) == Fraction(2, 5)
+    @test mediant_partner(Fraction(1, 2), Fraction(2, 3)) == Fraction(3, 4)
+    @test_throws ArgumentError mediant_partner(Fraction(1, 0; allow_infinite=true), Fraction(1, 2))
     @test is_mediant_triple(Fraction(1, 3), Fraction(2, 5), Fraction(1, 2))
     @test is_farey_triple(Fraction(1, 3), Fraction(2, 5), Fraction(1, 2))
     @test farey_parents(Fraction(0, 1)).left == Fraction(-1, 0; allow_infinite=true)
@@ -101,6 +113,9 @@ using RatMathCore
     @test_throws ArgumentError BaseSystem("0+", "Bad")
     @test to_decimal(binary, "1010") == 10
     @test from_decimal(binary, 10) == "1010"
+    @test to_base(10, binary) == "1010"
+    @test to_base(10//3, binary) == "1010/11"
+    @test to_base(1//3, binary; repeating=true) == "0.#01"
     @test from_decimal(binary, -10) == "-1010"
     @test to_decimal(hex, "ff") == 255
     @test_throws ArgumentError to_decimal(binary, "102")
@@ -118,9 +133,16 @@ using RatMathCore
     @test system_for_prefix("z") === nothing
 
     @test from_continued_fraction([3, 7, 16]) == 355//113
+    @test from_continued_fraction(BigInt[-3, 1, 2]) == -7//3
     @test continued_fraction(355//113) == BigInt[3, 7, 16]
+    @test from_continued_fraction(continued_fraction(-7//3)) == -7//3
     @test continued_fraction_string(3//2) == "1.~2"
+    @test continued_fraction_string(-7//3) == "-3.~1~2"
     @test from_continued_fraction_string("1.~2") == 3//2
+    @test from_continued_fraction_string("-3.~1~2") == -7//3
+    @test_throws ArgumentError from_continued_fraction([])
+    @test_throws ArgumentError from_continued_fraction([1, 0])
+    @test_throws ArgumentError from_continued_fraction_string("1.~~2")
     @test convergents(355//113) == [3//1, 22//7, 355//113]
     @test get_convergent(355//113, 1) == 22//7
     @test_throws BoundsError get_convergent(355//113, 5)

@@ -10,7 +10,7 @@ function _format_repeated_digits(digits::AbstractString; threshold::Integer=6)::
             count += 1
             j = nextind(digits, j)
         end
-        if count >= threshold
+        if count > threshold
             print(result, "{$c~$count}")
         else
             print(result, repeat(string(c), count))
@@ -142,39 +142,65 @@ function period_modulo(x::Rational, system::BaseSystem; limit::Integer=1_000_000
     k
 end
 
+function _scientific_digits(r::Rational{BigInt}, precision::Integer)
+    n = abs(numerator(r))
+    d = denominator(r)
+    digits = Char[]
+    exponent = 0
+    remn = big(0)
+
+    if n >= d
+        whole = string(n ÷ d)
+        exponent = length(whole) - 1
+        for c in whole
+            push!(digits, c)
+        end
+        remn = n % d
+    else
+        remn = n
+        leading_zeros = 0
+        while remn * 10 < d
+            remn *= 10
+            leading_zeros += 1
+        end
+        exponent = -(leading_zeros + 1)
+    end
+
+    while length(digits) < precision && remn != 0
+        remn *= 10
+        push!(digits, Char(Int('0') + Int(remn ÷ d)))
+        remn %= d
+    end
+
+    (digits=digits, exponent=exponent, remainder=remn)
+end
+
+function _period_digits_for_scientific(r::Rational{BigInt}; compact::Bool=true)
+    rep = repeating_decimal(abs(r); compact=false)
+    hash_index = findfirst('#', rep)
+    isnothing(hash_index) && return ""
+    period = rep[nextind(rep, hash_index):end]
+    period == "0" ? "" : (compact ? _format_repeated_digits(period; threshold=7) : period)
+end
+
 function scientific_notation(x::Rational; compact::Bool=true, precision::Integer=11, show_period_info::Bool=false)::String
     r = rat(x)
     numerator(r) == 0 && return "0"
     negative = numerator(r) < 0
-    dec = repeating_decimal(abs(r); compact=compact)
-    cleaned = replace(dec, "#0" => "")
-    hash_index = findfirst('#', cleaned)
-    plain = isnothing(hash_index) ? cleaned : cleaned[1:prevind(cleaned, hash_index)]
-    plain = replace(plain, "." => "")
-    first_nonzero = findfirst(c -> c != '0', plain)
-    if isnothing(first_nonzero)
-        return negative ? "-0" : "0"
+
+    sig = _scientific_digits(r, precision)
+    digits = sig.digits
+    rest = length(digits) > 1 ? String(digits[2:end]) : ""
+    period = _period_digits_for_scientific(r; compact=compact)
+
+    if isempty(period)
+        rest = replace(rest, r"0+$" => "")
     end
 
-    original = replace(isnothing(hash_index) ? cleaned : cleaned[1:prevind(cleaned, hash_index)], "#" => "")
-    decimal_point = findfirst('.', original)
-    if isnothing(decimal_point)
-        exponent = length(original) - first_nonzero
-    elseif first_nonzero < decimal_point
-        exponent = decimal_point - first_nonzero - 1
-    else
-        exponent = -(first_nonzero - decimal_point)
-    end
+    mantissa = isempty(rest) ? string(digits[1]) : string(digits[1]) * "." * rest
+    !isempty(period) && (mantissa *= "#" * period)
 
-    digits = plain[first_nonzero:end]
-    mantissa = length(digits) == 1 ? string(digits[1]) : string(digits[1]) * "." * String(digits[2:min(end, precision)])
-    if !isnothing(hash_index)
-        period = cleaned[nextind(cleaned, hash_index):end]
-        if !isempty(period)
-            mantissa *= "#" * period[1:min(end, max(1, precision))]
-        end
-    end
-    result = (negative ? "-" : "") * mantissa * "E" * string(exponent)
+    result = (negative ? "-" : "") * mantissa * "E" * string(sig.exponent)
     if show_period_info
         p = repeating_decimal_with_period(r; compact=compact).period
         p > 0 && (result *= " {period: $p}")

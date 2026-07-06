@@ -72,6 +72,20 @@ function from_decimal(system::BaseSystem, value::Integer)::String
     negative ? "-" * result : result
 end
 
+to_base(value::Integer, system::BaseSystem)::String = from_decimal(system, value)
+to_base(value::Integer, base::Integer)::String = to_base(value, base_system(base))
+
+function to_base(value::Rational, system::BaseSystem; repeating::Bool=false)::String
+    repeating && return repeating_base(value, system)
+    r = rat(value)
+    num_str = from_decimal(system, numerator(r))
+    denominator(r) == 1 && return num_str
+    den_str = from_decimal(system, denominator(r))
+    "$num_str/$den_str"
+end
+
+to_base(value::Rational, base::Integer; repeating::Bool=false)::String = to_base(value, base_system(base); repeating=repeating)
+
 function valid_digit_string(system::BaseSystem, s::AbstractString)::Bool
     isempty(s) && return false
     digits = startswith(s, "-") ? s[2:end] : s

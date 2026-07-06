@@ -13,6 +13,10 @@ to_decimal(binary, "1010")
 from_decimal(binary, 10)
 ```
 
+```@example bases
+to_base(10//3, binary)
+```
+
 ## Standard Bases
 
 [`base_system`](@ref) constructs alphanumeric bases from 2 through 62.
@@ -39,6 +43,10 @@ repeating_base(1//3, binary)
 ```
 
 ```@example bases
+to_base(1//3, binary; repeating=true)
+```
+
+```@example bases
 repeating_base(1//7, base_system(10))
 ```
 
@@ -49,4 +57,3 @@ The package includes a small prefix registry modeled on RatMath's JavaScript pac
 ```@example bases
 system_for_prefix("x")
 ```
-
