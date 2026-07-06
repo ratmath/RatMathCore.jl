@@ -11,6 +11,13 @@ Start here:
 - `AGENTS.md` - coding-agent instructions for using these docs in a new repo.
 - `doc-setup/` - Documenter.jl source and documentation environment.
 - `docs/` - compiled GitHub Pages-ready documentation after running `doc-setup/make.jl`.
+- `samples/` - runnable Julia scripts ported from representative `packages/core/examples` computations.
+
+Run the full sample suite from this folder:
+
+```bash
+julia --project=. samples/run_all.jl
+```
 
 The intended implementation should use Julia's built-in `BigInt` and `Rational{BigInt}` as the mathematical foundation, then add RatMath-specific interval, unreduced fraction, base-system, and formatting behavior on top.
 

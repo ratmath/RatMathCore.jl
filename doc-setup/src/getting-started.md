@@ -38,6 +38,22 @@ Representative JavaScript RatMath parity samples can be checked with:
 node test/js-parity-samples.mjs
 ```
 
+## Run the Samples
+
+The `samples/` directory contains runnable Julia ports of representative
+computations from `packages/core/examples`:
+
+```bash
+cd /Users/jostylr/ai-repos/ratmath/julia-port
+julia --project=. samples/run_all.jl
+```
+
+Run a single topic the same way:
+
+```bash
+julia --project=. samples/continued_fractions.jl
+```
+
 ## Build the Documentation
 
 Documenter.jl is installed in the documentation setup environment:

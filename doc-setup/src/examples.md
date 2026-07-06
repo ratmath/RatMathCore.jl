@@ -1,5 +1,13 @@
 # Examples
 
+For larger runnable scripts, see the package's `samples/` directory. These
+port representative JavaScript computations from `packages/core/examples` and
+can be run with:
+
+```bash
+julia --project=. samples/run_all.jl
+```
+
 ## Exact Computation Without Floating Point
 
 ```@example examples
@@ -51,4 +59,3 @@ m = mediant(left, right)
 target = 355//113
 best_approximation(target, 10)
 ```
-
