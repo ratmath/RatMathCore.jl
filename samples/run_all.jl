@@ -7,6 +7,7 @@ const SAMPLE_FILES = [
     "base_conversions.jl",
     "fractions_stern_brocot.jl",
     "scientific_and_repeating.jl",
+    "newton_kantorovich_cube_root.jl",
 ]
 
 for file in SAMPLE_FILES
