@@ -2,7 +2,7 @@
 
 This folder contains planning material for creating a Julia package that ports the useful parts of `packages/core` without mechanically copying its JavaScript architecture.
 
-[Julia-style documentation site](https://jostylr.com/ratmath-julia/)
+[Julia-style documentation site](https://ratmath.github.io/RatMathCore.jl/)
 
 Start here:
 
